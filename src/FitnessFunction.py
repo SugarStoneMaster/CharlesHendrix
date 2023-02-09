@@ -34,12 +34,12 @@ def config(configuration: src.Configuration.ComposerConfig):
                 bad_intervals += 1
             total_intervals += 1
 
-        print(solution)
-        print(total_intervals)
+        total_intervals -= 1 #da fixare conteggio intervalli
         ratio_notes = inscale_notes/total_notes
         ratio_intervals = bad_intervals/total_intervals
-        #fitness = ratio_notes  tutte note in scala
-        fitness = 0.3*ratio_notes + 0.7*ratio_intervals
+        ratio_numNotes = total_notes/configuration.num_notes
+        #fitness = ratio_notes  #tutte note in scala
+        fitness = 0.8*ratio_notes + 0.15*ratio_intervals + 0.05*ratio_numNotes
 
         return fitness
 

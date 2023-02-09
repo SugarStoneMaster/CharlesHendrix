@@ -3,11 +3,12 @@ import numpy
 
 from src.Configuration import ComposerConfig
 from src.FitnessFunction import config
+from src.GeneticOperators import setMutation
 
-
-configuration = ComposerConfig(min_duration=4)
+configuration = ComposerConfig(min_duration=8, bars=8)
 
 fitness_function = config(configuration)
+mutation_function = setMutation(configuration)
 
 
 num_generations = 50
@@ -26,7 +27,7 @@ keep_parents = 1
 
 crossover_type = "single_point"
 
-mutation_type = "swap"
+mutation_type = mutation_function
 mutation_percent_genes = 10
 
 ga_instance = pygad.GA(num_generations=num_generations,
@@ -50,6 +51,9 @@ ga_instance.run()
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
 print("Parameters of the best solution : {solution}".format(solution=solution))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+
+stream = configuration.toMusic21(solution)
+stream.show()
 
 
 
