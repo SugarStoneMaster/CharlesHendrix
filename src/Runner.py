@@ -1,20 +1,31 @@
+import music21
 import pygad
 import numpy
 
-from src.Configuration import ComposerConfig
-from src.FitnessFunction import config
+from src.Configuration import ComposerConfig, EMinKey
+from src.FitnessFunction import setFitnessFunction
 from src.GeneticOperators import setMutation
 
-configuration = ComposerConfig(min_duration=8, bars=8)
+configuration = ComposerConfig(min_duration=16, bars=4, key=EMinKey,
+                               weight_notes_inscale=0.9,
+                               weight_intervals=0.07,
+                               weight_numNotes=0.03)
 
-fitness_function = config(configuration)
+parsed1 = music21.converter.parse("../xmls/Eiffel_65_-_Blue_Da_Ba_Dee.xml")
+parsed2 = music21.converter.parse("../xmls/Pinguini-Tattici-Nucleari-Ringo-Starr-Sanremo-2020.xml")
+
+genetic1 = configuration.toGenetic(parsed1)
+genetic2 = configuration.toGenetic(parsed2)
+initial_population = [genetic1, genetic2]
+
+fitness_function = setFitnessFunction(configuration)
 mutation_function = setMutation(configuration)
 
 
-num_generations = 50
-num_parents_mating = 4
+num_generations = 200
+num_parents_mating = 2
 
-sol_per_pop = 8
+sol_per_pop = 2
 num_genes = configuration.num_notes
 
 init_range_low = configuration.break_value
@@ -22,10 +33,10 @@ init_range_high = configuration.repeat_value + 1
 random_mutation_min_val = configuration.break_value
 random_mutation_max_val = configuration.repeat_value + 1
 
-parent_selection_type = "sss"
+parent_selection_type = "rws"
 keep_parents = 1
 
-crossover_type = "single_point"
+crossover_type = "two_points"
 
 mutation_type = mutation_function
 mutation_percent_genes = 10
@@ -44,13 +55,15 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        mutation_percent_genes=mutation_percent_genes,
                        random_mutation_min_val=random_mutation_min_val,
                        random_mutation_max_val=random_mutation_max_val,
-                       gene_type=int)
+                       gene_type=int,
+                       initial_population=initial_population)
 
 ga_instance.run()
 
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
 print("Parameters of the best solution : {solution}".format(solution=solution))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+ga_instance.plot_fitness()
 
 stream = configuration.toMusic21(solution)
 stream.show()

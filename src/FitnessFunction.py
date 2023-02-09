@@ -1,7 +1,7 @@
 import src.Configuration
 
 
-def config(configuration: src.Configuration.ComposerConfig):
+def setFitnessFunction(configuration: src.Configuration.ComposerConfig):
     def fitness_function(solution, solution_idx):
         bad_intervals = 0
         total_intervals = 0
@@ -35,11 +35,19 @@ def config(configuration: src.Configuration.ComposerConfig):
             total_intervals += 1
 
         total_intervals -= 1 #da fixare conteggio intervalli
-        ratio_notes = inscale_notes/total_notes
-        ratio_intervals = bad_intervals/total_intervals
-        ratio_numNotes = total_notes/configuration.num_notes
-        #fitness = ratio_notes  #tutte note in scala
-        fitness = 0.8*ratio_notes + 0.15*ratio_intervals + 0.05*ratio_numNotes
+        try:
+            ratio_notes_inscale = inscale_notes/total_notes
+        except ZeroDivisionError:
+            ratio_notes_inscale = 0
+        try:
+            ratio_intervals = bad_intervals/total_intervals
+        except ZeroDivisionError:
+            ratio_intervals = 0
+        try:
+            ratio_numNotes = total_notes/configuration.num_notes
+        except ZeroDivisionError:
+            ratio_numNotes = 0
+        fitness = configuration.weight_notes_inscale*ratio_notes_inscale + configuration.weight_intervals*ratio_intervals + configuration.weight_numNotes*ratio_numNotes
 
         return fitness
 
