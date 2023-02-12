@@ -12,7 +12,7 @@ def setMutation(configuration: src.Configuration.ComposerConfig):
         num_individuals = offspring.shape[0]
         num_genes = offspring.shape[1]
         mutations = ["pitchUp", "pitchDown", "sustain", "break"]
-        weights = [   0.3,         0.3,         0.3,       0.1]
+        weights = [configuration.weight_pitchUp, configuration.weight_pitchDown, configuration.weight_sustain, configuration.weight_break]
         samples = choices(mutations, weights, k = num_individuals) #generates k choices
         for individual_idx in range(num_individuals):
             random_gene_idx = numpy.random.choice(range(num_genes))
