@@ -46,6 +46,7 @@ class Key:
             note1 = self.distinct_notes[i-1]
             note2 = self.distinct_notes[(i+1)%7]
             note3 = self.distinct_notes[(i+3)%7]
+            #note4 = self.distinct_notes[(i+5)%7] #accordo di settima
             chord = note1+"3" + ' ' + note2+"3" + ' ' + note3+"3"
             self.chords[i] = chord
 

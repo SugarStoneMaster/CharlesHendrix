@@ -3,7 +3,7 @@ import music21.stream
 import src.Configuration
 
 
-def setNotesFitnessFunction(configuration: src.Configuration.Composer):
+def setMelodyFitnessFunction(configuration: src.Configuration.Composer):
     def fitness_function(solution, solution_idx):
         bad_intervals = 0
         total_intervals = 0
@@ -27,13 +27,18 @@ def setNotesFitnessFunction(configuration: src.Configuration.Composer):
                 note1 = note1_to_save
                 note1_to_save = None
 
+
+
             if i != configuration.num_music_elements - 1:
                 note2 = solution[i+1]
+            else:
+                note2 = "break"
 
             if note2 == configuration.rest_value or note2 == configuration.sustain_value:
                 note1_to_save = note1
                 continue
-
+            elif note2 == "break":
+                break
 
             bar_idx = i // configuration.min_duration
             if configuration.in_chord(note1, bar_idx):

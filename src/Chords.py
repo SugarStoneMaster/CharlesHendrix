@@ -3,7 +3,7 @@ import music21.converter
 import pygad
 
 import src.Configuration
-from src.Configuration import Composer
+from src.Configuration import Composer, Key
 from src.FitnessFunction import setChordsFitnessFunction
 
 def createProgression(configuration: src.Configuration.Composer):

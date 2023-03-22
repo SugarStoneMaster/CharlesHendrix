@@ -4,40 +4,40 @@ import numpy
 
 from src.Chords import createProgression
 from src.Configuration import Composer, Key
-from src.FitnessFunction import  setNotesFitnessFunction
+from src.FitnessFunction import  setMelodyFitnessFunction
 from src.GeneticOperators import setMutation
 
+
+
 #inizializzazione
-key = Key(note="E", mode="Maj")
-configuration = Composer(min_duration=8, bars=8, key=key,
+key = Key(note="D", mode="Min")
+composer = Composer(chromatic=False, succession=[1, 4, 5, 4], min_duration=8, bars=4, key=key,
                          weight_notes_inscale=0,
                          weight_notes_inchord=0.7,
-                         weight_intervals=0.20,
-                         weight_numNotes=0.10,
-                         chromatic=False,
-                         succession=[1, 5, 6, 4],
-                         weight_sustain=0.3,
-                         weight_rest=0.1,
-                         weight_pitchUp=0.3,
-                         weight_pitchDown=0.3)
+                         weight_intervals=0.25,
+                         weight_numNotes=0.05,
+                         weight_sustain=0.25,
+                         weight_rest=0.25,
+                         weight_pitchUp=0.25,
+                         weight_pitchDown=0.25)
 
-#configuration.succession = createProgression(configuration) #crea tramite algoritmo genetico interattivo una progressione di accordi
+#composer.succession = createProgression(composer) #crea tramite algoritmo genetico interattivo una progressione di accordi
 
-fitness_function = setNotesFitnessFunction(configuration)
-mutation_function = setMutation(configuration)
+fitness_function = setMelodyFitnessFunction(composer)
+mutation_function = setMutation(composer)
 
-num_generations = 200
+num_generations = 100
 num_parents_mating = 4
 
 sol_per_pop = 8
-num_genes = configuration.num_music_elements
+num_genes = composer.num_music_elements
 
-init_range_low = configuration.rest_value
-init_range_high = configuration.sustain_value + 1
-random_mutation_min_val = configuration.rest_value
-random_mutation_max_val = configuration.sustain_value + 1
+init_range_low = composer.rest_value
+init_range_high = composer.sustain_value + 1
+random_mutation_min_val = composer.rest_value
+random_mutation_max_val = composer.sustain_value + 1
 
-parent_selection_type = "rws"
+parent_selection_type = "rank"
 keep_parents = 1
 
 crossover_type = "two_points"
@@ -69,10 +69,8 @@ print("Fitness value of the best solution = {solution_fitness}".format(solution_
 #ga_instance.plot_fitness()
 
 #passaggio dalla rappresentazione genetica a quella musicale con Music21
-stream = configuration.toMusic21(solution)
-stream = configuration.addChordsToMusic21(stream)
-
-
+stream = composer.toMusic21(solution)
+stream = composer.addChordsToMusic21(stream)
 
 stream.show() #riproduzione dello spartito generato con programma esterno
 
