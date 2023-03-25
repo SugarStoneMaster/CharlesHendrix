@@ -53,13 +53,13 @@ class Key:
 
 class Composer:
 
-    def __init__(self, bars=4, min_duration=16, key=Key(note="C", mode="Maj"), bad_intervals=[2, 11, 10, 1, 6], weight_notes_inchord = 0.3,
-                 weight_notes_inscale = 0.65, weight_intervals = 0.2, weight_numNotes = 0.15, chromatic = True,
+    def __init__(self, bars=4, min_duration=8, key=Key(note="C", mode="Maj"), bad_intervals=[2, 11, 10, 1, 6], weight_notes_inchord = 0.7,
+                 weight_notes_inscale = 0, weight_intervals = 0.25, weight_numNotes = 0.05, chromatic = False,
                  succession = [1, 1, 6, 7],
                  weight_pitchUp = 0.25,
                  weight_pitchDown = 0.25,
-                 weight_sustain = 0.4,
-                 weight_rest = 0.1):
+                 weight_sustain = 0.25,
+                 weight_rest = 0.25):
 
         self.chromatic = chromatic #modalità di composizione
         if self.chromatic: #composizione in modalità cromatica, in cui tutte le note sono disponibili, non solo quelle della scala (consigliata per comporre Jazz)
@@ -117,8 +117,7 @@ class Composer:
         else:
             return False
 
-
-    def toMusic21(self, solution) -> music21.stream.Stream:
+    def toMusic21OnlyMelody(self, solution) -> music21.stream.Stream:
         """Trasforma una rappresentazione genetica di una melodia in uno stream riproducibile di Music21"""
         stream = music21.stream.Stream()
         for i in range(len(solution)):
@@ -157,6 +156,10 @@ class Composer:
         stream.clef = music21.clef.TrebleClef() #per visualizzare la composizione in chiave di violino
         return stream
 
+
+    def toMusic21(self, solution):
+        """Trasforma una rappresentazione genetica di una melodia in uno stream riproducibile di Music21 con la sua progressione di accordi"""
+        return self.addChordsToMusic21(self.toMusic21OnlyMelody(solution))
 
     def toGeneticFromXML(self, filename: str) -> list:
         """Effettua il parsing di un file .musicxml solo melodia, passando per Music21, per creare un individuo genetico"""

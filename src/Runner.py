@@ -70,7 +70,6 @@ print("Fitness value of the best solution = {solution_fitness}".format(solution_
 
 #passaggio dalla rappresentazione genetica a quella musicale con Music21
 stream = composer.toMusic21(solution)
-stream = composer.addChordsToMusic21(stream)
 
 stream.show() #riproduzione dello spartito generato con programma esterno
 
