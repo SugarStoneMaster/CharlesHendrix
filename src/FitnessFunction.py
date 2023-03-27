@@ -64,7 +64,8 @@ def setMelodyFitnessFunction(configuration: src.Configuration.Composer):
         except ZeroDivisionError:
             ratio_inChord = 0
         try:
-            ratio_intervals = bad_intervals/total_intervals
+            good_intervals = total_intervals - bad_intervals
+            ratio_intervals = good_intervals/total_intervals
         except ZeroDivisionError:
             ratio_intervals = 0
         try:
