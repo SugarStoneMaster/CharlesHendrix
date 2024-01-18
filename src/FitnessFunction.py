@@ -4,7 +4,7 @@ import src.Configuration
 
 
 def setMelodyFitnessFunction(configuration: src.Configuration.Composer):
-    def fitness_function(solution, solution_idx):
+    def fitness_function(ga_instance, solution, solution_idx):
         bad_intervals = 0
         total_intervals = 0
         total_notes_inChord = 0
@@ -85,7 +85,7 @@ def setMelodyFitnessFunction(configuration: src.Configuration.Composer):
 
 
 def setChordsFitnessFunction(configuration: src.Configuration.Composer):
-    def fitness_function(solution, solution_idx):
+    def fitness_function(ga_instance, solution, solution_idx):
         stream = music21.stream.Stream()
         print(solution)
         for chord_idx in solution:

@@ -10,7 +10,7 @@ from src.GeneticOperators import setMutation
 
 
 #inizializzazione
-key = Key(note="D", mode="Min")
+key = Key(note="A", mode="Min")
 composer = Composer(chromatic=False, succession=[1, 4, 5, 4], min_duration=8, bars=4, key=key,
                          weight_notes_inscale=0,
                          weight_notes_inchord=0.7,
