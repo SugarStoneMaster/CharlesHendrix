@@ -8,19 +8,20 @@ from src.genome_to_music import genome_to_music, print_composition_details
 
 
 ga_instance = pygad.GA(
-    num_generations=10,
-    num_parents_mating=2,
+    num_generations=3,
+    num_parents_mating=5,
     fitness_func=fitness_function,
-    sol_per_pop=2,
+    sol_per_pop=20,
     num_genes=total_genes,
     gene_space=gene_space,
     gene_type=int,
-    parent_selection_type="sss",
-    keep_parents=2,
-    crossover_type="single_point",
+    parent_selection_type="rank",
+    keep_parents=5,
+    crossover_type="uniform",
     mutation_type="random",
-    mutation_percent_genes=5
+    mutation_percent_genes=10
 )
+
 
 ga_instance.run()
 

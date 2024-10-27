@@ -56,12 +56,15 @@ num_chord_instruments = len(chord_instrument_mapping)
 # Durations in quarter lengths (1 quarter length = 1 beat)
 duration_values = {
     0: 0.25,  # Sixteenth note
-    1: 0.5,   # Eighth note
-    2: 1.0,   # Quarter note
-    3: 1.5,   # Dotted quarter note
-    4: 2.0,   # Half note
-    5: 3.0,   # Dotted half note
-    6: 4.0    # Whole note
+    1: 0.25,  # Sixteenth note
+    2: 0.5,   # Eighth note
+    3: 0.5,  # Eighth note
+    4: 0.5,  # Eighth note
+    5: 1.0,   # Quarter note
+    6: 1.0,  # Quarter note
+    7: 1.5,   # Dotted quarter note
+    8: 2.0,   # Half note
+    9: 3.0,   # Dotted half note
 }
 num_durations = len(duration_values)
 
@@ -113,10 +116,10 @@ minor_chord_progressions = {
 }
 num_progressions = len(major_chord_progressions)
 
-max_melody_notes = 64  # Maximum number of melody notes
+max_melody_notes = 32  # Maximum number of melody notes
 max_chords = 4        # Maximum number of chords
 
-total_genes = 5 + (max_melody_notes * 3) + max_chords
+total_genes = 5 + (max_melody_notes * 3)
 
 scale_degree_values = list(range(0, 8))  # 0 (Rest) to 7 (7th scale degree)
 octave_values = [4, 5]
@@ -125,7 +128,7 @@ octave_values = [4, 5]
 gene_space = []
 
 gene_space.append({'low': 0, 'high': num_scales})                # Scale
-gene_space.append({'low': 65, 'high': 215})                          # BPM (Tempo)
+gene_space.append({'low': 75, 'high': 215})                          # BPM (Tempo)
 gene_space.append({'low': 0, 'high': num_melody_instruments})    # Melody Instrument
 gene_space.append({'low': 0, 'high': num_chord_instruments})     # Chord Instrument
 gene_space.append({'low': 0, 'high': num_progressions})          # Chord Progression
@@ -137,6 +140,3 @@ for _ in range(max_melody_notes):
     gene_space.append({'low': 0, 'high': num_durations})        # Note Duration
 
 
-# Chord durations (no longer need chord types)
-for _ in range(max_chords):
-    gene_space.append({'low': 0, 'high': num_durations})        # Chord Duration

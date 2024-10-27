@@ -1,3 +1,4 @@
+import music21.scale
 from music21 import roman, scale
 
 from gene_space import *
@@ -42,7 +43,7 @@ def genome_to_music(solution):
         scale_obj = music21.scale.MajorScale(key_signature.tonic)
     else:
         chord_type_mapping = minor_chord_type_mapping
-        scale_obj = music21.scale.HarmonicMinorScale(key_signature.tonic)
+        scale_obj = music21.scale.MinorScale(key_signature.tonic)
 
     # Prepare scale pitches
     scale_pitches = [p.name for p in scale_obj.getPitches()]
@@ -50,6 +51,7 @@ def genome_to_music(solution):
     # Process melody notes
     idx = 5
     total_duration = 0.0
+    last_used_idx = idx  # Keep track of the last used gene index
     while total_duration < 16.0 and idx + 2 < len(solution):
         scale_degree_gene = solution[idx]
         octave_gene = solution[idx + 1]
@@ -74,6 +76,8 @@ def genome_to_music(solution):
         n.duration = music21.duration.Duration(duration_value)
         melody_part.append(n)
 
+        last_used_idx = idx  # Update the last used index
+
         if total_duration >= 16.0:
             break
 
@@ -81,10 +85,7 @@ def genome_to_music(solution):
     segment_length = 16.0 / max_chords
     idx_chords = 5 + (max_melody_notes * 3)
     chord_count = 0
-    while chord_count < max_chords and idx_chords < len(solution):
-        duration_gene = solution[idx_chords]
-        idx_chords += 1
-
+    while chord_count < max_chords:
         chord_scale_degree = chord_progression[chord_count % len(chord_progression)]
         chord_type = chord_type_mapping[chord_scale_degree]
 
@@ -116,8 +117,7 @@ def genome_to_music(solution):
     score.insert(0, melody_part)
     score.insert(0, chord_part)
 
-    return score
-
+    return score, last_used_idx
 
 def print_composition_details(composition: music21.stream.Score, solution):
     # Print the scale/key signature
