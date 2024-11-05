@@ -5,9 +5,9 @@ from src.gene_space import scale_mapping, melody_instrument_mapping, chord_instr
     minor_chord_type_mapping, major_chord_progressions, major_chord_type_mapping
 
 
-def genome_to_features():
-    input_file = '../../data/user_feedback.csv'
-    output_file = '../../data/user_feedback_mapped.csv'
+def genome_to_data():
+    input_file = '../../data/genome_user_feedback.csv'
+    output_file = '../../data/user_feedback.csv'
 
     # Ensure the data directory exists
     os.makedirs('../../data', exist_ok=True)
@@ -29,7 +29,7 @@ def genome_to_features():
                 # Map the Scale
                 scale_idx = int(mapped_row[0])
                 scale_name = scale_mapping.get(scale_idx, f"Unknown ({scale_idx})")
-                mapped_row[0] = scale_name + (" minor" if scale_name.islower() else " major")
+                mapped_row[0] = scale_name
 
                 # Map the BPM (leave as is)
                 # mapped_row[1] = mapped_row[1]
@@ -64,4 +64,4 @@ def genome_to_features():
 
 
 if __name__ == '__main__':
-    genome_to_features()
+    genome_to_data()
