@@ -1,11 +1,22 @@
 import numpy as np
 import pandas as pd
-from music21 import scale, key
+from imblearn.over_sampling import SMOTE
 from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from src.data_processing.utility import note_to_midi, map_duration_code, compute_melodic_intervals, \
+    compute_progression_complexity, encode_chord_functions, chord_functions
+
+"""
+   Data cleaning: rimuovere le colonne con i -1 a partire dalla riga con più note. NO IMPUTATION
+   Feature construction: Dimensionality reduction PCA e/oppure costruzione di feature derivate ad esempio numero di note suonate, durata media, etc.
+   Feature scaling: scaling di features numeriche come numero di note suonate, durata media, etc.
+   Feature selection: una volta costruite le features vengono droppate le note. DA FARE low-variance e univariate
+   Data balancing: SMOTE
+"""
 
 
-def feature_engineering(df):
+def data_feature_engineering(df):
     # Initialize new feature columns
     df['num_notes_played'] = 0
     df['avg_note_duration'] = 0.0
@@ -73,7 +84,6 @@ def feature_engineering(df):
     # Concatenate the new columns to the dataframe
     df = pd.concat([df, scale_encoded_df, melody_instr_encoded_df, chord_instr_encoded_df], axis=1)
 
-    # Drop the original categorical columns
 
     # Define BPM bins and labels
     bpm_bins = [60, 90, 120, 150, 200, 220]
@@ -131,82 +141,27 @@ def feature_engineering(df):
         note_columns.extend([f'Note {i}', f'Octave {i}', f'Duration {i}'])
     df.drop(columns=note_columns, inplace=True)
 
+
+    df.to_csv(path_or_buf='../data/processed/feature_engineering_notes.csv', index=False)
+
     return df
 
 
-
-duration_values = {
-    0: 0.25,  # Sixteenth note
-    1: 0.25,  # Sixteenth note
-    2: 0.5,  # Eighth note
-    3: 0.5,  # Eighth note
-    4: 0.5,  # Eighth note
-    5: 1.0,  # Quarter note
-    6: 1.0,  # Quarter note
-    7: 1.5,  # Dotted quarter note
-    8: 2.0,  # Half note
-    9: 3.0,  # Dotted half note
-}
-
-chord_functions = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'viio', 'i', 'iio', 'III', 'iv', 'v', 'VI', 'VII']
+def feature_construction(df):
+    return
 
 
-def map_duration_code(duration_code):
-    return duration_values.get(int(duration_code), np.nan)
+def split(df, smote=False):
+    # Convert 'UserInput' to categorical data
+    y = df['UserInput']
+    df.drop(['UserInput'], axis=1, inplace=True)
+    X = df
 
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-def note_to_midi(scale_name, scale_degree, octave):
-    if scale_degree == 0:
-        return None  # Rest
-    # Determine if the scale is major or minor
-    if scale_name.islower():  # Minor scale
-        key_obj = key.Key(scale_name)
-        sc = scale.MinorScale(key_obj.tonic)
-    else:
-        key_obj = key.Key(scale_name)
-        sc = scale.MajorScale(key_obj.tonic)
-    # Get the pitch for the scale degree
-    degree = scale_degree
-    # Ensure degree is within 1-7
-    if degree < 1 or degree > 7:
-        return None
-    pitch_obj = sc.pitchFromDegree(degree)
-    pitch_obj.octave = octave
-    return pitch_obj.midi
+    if smote:
+        smote = SMOTE(random_state=42)
+        X_train, y_train = smote.fit_resample(X_train, y_train)
 
-
-def compute_melodic_intervals(row):
-    intervals = []
-    previous_pitch = None
-    scale_name = row['Scale']
-    for i in range(1, 33):
-        note_col = f'Note {i}'
-        octave_col = f'Octave {i}'
-        note_value = row[note_col]
-        octave_value = row[octave_col]
-        if note_value == -1 or note_value == 0:
-            continue  # Skip unused notes and rests
-        current_pitch = note_to_midi(scale_name, int(note_value), int(octave_value))
-        if previous_pitch is not None and current_pitch is not None:
-            interval = current_pitch - previous_pitch
-            intervals.append(interval)
-        previous_pitch = current_pitch
-    if intervals:
-        return np.mean(intervals), np.std(intervals)
-    else:
-        return 0.0, 0.0
-
-
-def encode_chord_functions(progression_str):
-    chords = progression_str.split('-')
-    chord_presence = {func: 0 for func in chord_functions}
-    for chord in chords:
-        if chord in chord_presence:
-            chord_presence[chord] += 1
-    return list(chord_presence.values())
-
-
-def compute_progression_complexity(progression_str):
-    chords = progression_str.split('-')
-    unique_chords = set(chords)
-    return len(unique_chords)
+    return X_train, y_train, X_test, y_test
