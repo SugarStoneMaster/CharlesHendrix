@@ -1,18 +1,7 @@
 import numpy as np
 from music21 import key, scale
 
-duration_values = {
-    0: 0.25,  # Sixteenth note
-    1: 0.25,  # Sixteenth note
-    2: 0.5,  # Eighth note
-    3: 0.5,  # Eighth note
-    4: 0.5,  # Eighth note
-    5: 1.0,  # Quarter note
-    6: 1.0,  # Quarter note
-    7: 1.5,  # Dotted quarter note
-    8: 2.0,  # Half note
-    9: 3.0,  # Dotted half note
-}
+from src.data_collection.gene_space import duration_values
 
 chord_functions = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'viio', 'i', 'iio', 'III', 'iv', 'v', 'VI', 'VII']
 

@@ -5,17 +5,8 @@ from src.test_models.utility import run_ga, evaluate_model
 def test_random_forest_classifier(X_train, y_train, X_test, y_test):
     fitness_function = set_fitness_function(X_train, y_train, X_test, y_test)
 
-    run_ga(gene_space, fitness_function)
+    return run_ga(gene_space, fitness_function)
 
-
-    """print("Confusion Matrix:")
-    print(confusion_matrix(y_test, y_pred))
-
-    print("\nClassification Report:")
-    print(classification_report(y_test, y_pred))
-
-    print("\nAccuracy Score:")
-    print(f"{accuracy_score(y_test, y_pred):.2f}")"""
 
 
 
@@ -64,7 +55,7 @@ def set_fitness_function(X_train, y_train, X_test, y_test):
 
         y_pred = clf.predict(X_test)
 
-        mae, qwk = evaluate_model(y_test, y_pred, model_type="classification")
+        mae, qwk = evaluate_model(y_test, y_pred, model_type="classifier")
         negate_mae = -mae
 
         #multi-objective opt

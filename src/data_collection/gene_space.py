@@ -121,7 +121,6 @@ max_chords = 4        # Maximum number of chords
 
 total_genes = 5 + (max_melody_notes * 3)
 
-scale_degree_values = list(range(0, 8))  # 0 (Rest) to 7 (7th scale degree)
 octave_values = [4, 5]
 
 # Global parameters

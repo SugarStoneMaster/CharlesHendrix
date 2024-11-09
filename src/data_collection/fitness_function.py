@@ -1,4 +1,4 @@
-from src.genome_to_music import genome_to_music, print_composition_details
+from src.data_collection.genome_to_music import genome_to_music, print_composition_details
 import csv
 import os
 

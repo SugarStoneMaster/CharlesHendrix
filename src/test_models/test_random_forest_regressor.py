@@ -7,9 +7,7 @@ from src.test_models.utility import run_ga, evaluate_model
 def test_random_forest_regressor(X_train, y_train, X_test, y_test):
     fitness_function = set_fitness_function(X_train, y_train, X_test, y_test)
 
-    run_ga(gene_space, fitness_function)
-
-
+    return run_ga(gene_space, fitness_function)
 
 
 
@@ -70,7 +68,7 @@ def set_fitness_function(X_train, y_train, X_test, y_test):
 
 
         # Evaluate the model
-        mae, qwk = evaluate_model(y_test, y_pred, model_type="regression")
+        mae, qwk = evaluate_model(y_test, y_pred, model_type="regressor")
         negate_mae = -mae
 
         #multi-objective opt

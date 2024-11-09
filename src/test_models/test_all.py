@@ -4,8 +4,10 @@ from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix, classification_report, accuracy_score
 from sklearn.metrics import mean_absolute_error, cohen_kappa_score
 from src.data_processing.feature_engineering import data_feature_engineering, split
+from src.test_models.test_gradient_boosting_regressor import test_gradient_boosting_regressor
 from src.test_models.test_random_forest_classifier import test_random_forest_classifier
 from src.test_models.test_random_forest_regressor import test_random_forest_regressor
+from src.test_models.utility import dominates
 
 """model = Sequential([tensorflow.keras.layers.Dense(64, activation='relu', # First layer with 128 neurons
                                                       ), # Here we must specify the input shape
@@ -36,18 +38,41 @@ def main():
 
     X_train, y_train, X_test, y_test = split(df, smote=True)
 
-    test_random_forest_classifier(X_train, y_train, X_test, y_test)
 
-    test_random_forest_regressor(X_train, y_train, X_test, y_test)
 
+    test_all_models(X_train, X_test, y_train, y_test)
 
 
 
 
 
 def test_all_models(X_train, X_test, y_train, y_test):
+    best_model = "classifier"
 
-    return
+    best_fitness, best_solution = test_random_forest_classifier(X_train, y_train, X_test, y_test)
+    fitness, solution = test_random_forest_regressor(X_train, y_train, X_test, y_test)
+
+    best_mae, best_qwk = best_fitness
+    mae, qwk = fitness
+    if dominates(mae, qwk, best_mae, best_qwk):
+        best_model = "regressor"
+        best_mae = mae
+        best_qwk = qwk
+        best_solution = solution
+
+    fitness, solution = test_gradient_boosting_regressor(X_train, y_train, X_test, y_test)
+    mae, qwk = fitness
+    if dominates(mae, qwk, best_mae, best_qwk):
+        best_model = "gradient regressor"
+        best_mae = mae
+        best_qwk = qwk
+        best_solution = solution
+
+
+
+    print(f"Best Model: {best_model}")
+
+    return best_model, best_solution, best_mae, best_qwk
 
 
 

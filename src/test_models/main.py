@@ -7,7 +7,8 @@ def main():
 
     tracker.start()
 
-    #GA algorithm with inference
+    #data processing, models' testing
+
 
     tracker.stop()
 

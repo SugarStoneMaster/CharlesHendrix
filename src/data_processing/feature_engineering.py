@@ -17,7 +17,31 @@ from src.data_processing.utility import note_to_midi, map_duration_code, compute
 
 
 def data_feature_engineering(df):
-    # Initialize new feature columns
+
+    df = data_cleaning(df)
+    df = feature_construction(df)
+    df = feature_scaling(df)
+    df = feature_selection(df)
+
+
+
+
+    df.to_csv(path_or_buf='./feature_engineering_notes.csv', index=False)
+
+    return df
+
+def data_cleaning(df):
+    """# Identify numerical features for imputation
+
+
+        # Impute missing values with mean
+        imputer = SimpleImputer(strategy='mean')
+        df[numerical_features] = imputer.fit_transform(df[numerical_features])"""
+
+
+    return df
+
+def feature_construction(df):
     df['num_notes_played'] = 0
     df['avg_note_duration'] = 0.0
     df['std_note_duration'] = 0.0
@@ -64,91 +88,48 @@ def data_feature_engineering(df):
         else:
             df.at[index, 'proportion_rests'] = 0.0
 
-    # One-Hot Encode 'Scale'
-    scale_ohe = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
-    scale_encoded = scale_ohe.fit_transform(df[['Scale']])
-    scale_encoded_df = pd.DataFrame(scale_encoded, columns=scale_ohe.get_feature_names_out(['Scale']))
-
-    # One-Hot Encode 'Melody Instrument'
-    melody_instr_ohe = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
-    melody_instr_encoded = melody_instr_ohe.fit_transform(df[['Melody Instrument']])
-    melody_instr_encoded_df = pd.DataFrame(melody_instr_encoded,
-                                           columns=melody_instr_ohe.get_feature_names_out(['Melody Instrument']))
-
-    # One-Hot Encode 'Chord Instrument'
-    chord_instr_ohe = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
-    chord_instr_encoded = chord_instr_ohe.fit_transform(df[['Chord Instrument']])
-    chord_instr_encoded_df = pd.DataFrame(chord_instr_encoded,
-                                          columns=chord_instr_ohe.get_feature_names_out(['Chord Instrument']))
-
-    # Concatenate the new columns to the dataframe
-    df = pd.concat([df, scale_encoded_df, melody_instr_encoded_df, chord_instr_encoded_df], axis=1)
-
-
-    # Define BPM bins and labels
-    bpm_bins = [60, 90, 120, 150, 200, 220]
-    bpm_labels = ['Slow', 'Medium', 'Fast', 'Very Fast', 'Extremely Fast']
-
-    # Binning BPM
-    df['BPM_Binned'] = pd.cut(df['BPM'], bins=bpm_bins, labels=bpm_labels, right=False)
-
-    # One-Hot Encode the binned BPM
-    bpm_ohe = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
-    bpm_encoded = bpm_ohe.fit_transform(df[['BPM_Binned']])
-    bpm_encoded_df = pd.DataFrame(bpm_encoded, columns=bpm_ohe.get_feature_names_out(['BPM_Binned']))
-
-    # Concatenate and drop the 'BPM' and 'BPM_Binned' columns
-    df = pd.concat([df, bpm_encoded_df], axis=1)
-    df.drop(['BPM', 'BPM_Binned'], axis=1, inplace=True)
-
-
 
     df['avg_melodic_interval'], df['std_melodic_interval'] = zip(*df.apply(compute_melodic_intervals, axis=1))
 
-
-
     df['progression_complexity'] = df['Progression'].apply(compute_progression_complexity)
 
+    bpm_bins = [60, 90, 120, 150, 200, 220]
+    bpm_labels = ['Slow', 'Medium', 'Fast', 'Very Fast', 'Extremely Fast']
+    df['BPM_Binned'] = pd.cut(df['BPM'], bins=bpm_bins, labels=bpm_labels, right=False)
 
+    return df
+
+
+def feature_scaling(df):
+    categorical_features = ['Scale', 'Melody Instrument', 'Chord Instrument', 'BPM_Binned']
+    df = pd.get_dummies(df, columns=categorical_features)
 
     # Apply the function and create a dataframe
     chord_func_values = df['Progression'].apply(encode_chord_functions)
     chord_func_df = pd.DataFrame(chord_func_values.tolist(), columns=[f'Chord_{func}' for func in chord_functions])
-
-    # Concatenate the chord function features
     df = pd.concat([df, chord_func_df], axis=1)
 
-    # Drop the original 'Progression' column
-    df.drop(['Progression'], axis=1, inplace=True)
-
-    df.drop(['Scale', 'Melody Instrument', 'Chord Instrument'], axis=1, inplace=True)
-
-    # Identify numerical features for imputation
+    # Scale numerical features
     numerical_features = ['avg_note_duration', 'std_note_duration', 'avg_pitch', 'pitch_range', 'avg_melodic_interval',
                           'std_melodic_interval']
-
-    # Impute missing values with mean
-    imputer = SimpleImputer(strategy='mean')
-    df[numerical_features] = imputer.fit_transform(df[numerical_features])
-
-    # Scale numerical features
     scaler = StandardScaler()
     df[numerical_features] = scaler.fit_transform(df[numerical_features])
 
-    # Optionally, drop raw note features if they are not needed
+    return df
+
+
+def feature_selection(df):
+    # Drop the original 'Progression' column
+    df.drop(['Progression'], axis=1, inplace=True)
+
+    df.drop(['BPM'], axis=1, inplace=True)
+
     note_columns = []
     for i in range(1, 33):
         note_columns.extend([f'Note {i}', f'Octave {i}', f'Duration {i}'])
     df.drop(columns=note_columns, inplace=True)
 
-
-    df.to_csv(path_or_buf='../data/processed/feature_engineering_notes.csv', index=False)
-
     return df
-
-
-def feature_construction(df):
-    return
 
 
 def split(df, smote=False):

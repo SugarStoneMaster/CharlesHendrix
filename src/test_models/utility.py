@@ -3,8 +3,8 @@ import pygad
 from sklearn.metrics import mean_absolute_error, cohen_kappa_score
 
 
-def evaluate_model(y_test, y_pred, model_type='regression'):
-    if model_type == 'regression':
+def evaluate_model(y_test, y_pred, model_type='regressor'):
+    if model_type == 'regressor':
         # Round regression predictions to nearest integer between 1 and 5
         y_pred_rounded = np.clip(np.rint(y_pred), 1, 5).astype(int)
     else:
@@ -21,10 +21,10 @@ def run_ga(gene_space, fitness_function):
     num_genes = len(gene_space)
 
     ga_instance = pygad.GA(
-        num_generations=200,
+        num_generations=100,
         num_parents_mating=10,
         fitness_func=fitness_function,
-        sol_per_pop=25,
+        sol_per_pop=20,
         num_genes=num_genes,
         gene_space=gene_space,
         gene_type=int,
@@ -32,12 +32,12 @@ def run_ga(gene_space, fitness_function):
         keep_parents=2,
         crossover_type="uniform",
         mutation_type="random",
-        mutation_percent_genes=40,
+        mutation_percent_genes=70,
         random_mutation_min_val=0,
         random_mutation_max_val=1,
         suppress_warnings=True,
         parallel_processing=10,
-        keep_elitism=5,
+        keep_elitism=3,
     )
     ga_instance.on_generation = on_generation
 
@@ -49,14 +49,14 @@ def run_ga(gene_space, fitness_function):
     print(f"Best Hyperparameters Found: {solution}")
     print(f"Best Fitness Value: {solution_fitness}")
 
-    return solution, solution_fitness
+    return solution_fitness, solution
 
 
 # Initialize tracking variables
 no_improvement_count = 0
 max_no_improvement_generations = 50
-best_mae = float("-inf")  # Start with worst possible MAE
-best_qwk = float("-inf")  # Start with worst possible QWK
+best_mae = -1000000
+best_qwk = -1000000
 def on_generation(ga_instance: pygad.GA):
     global no_improvement_count, best_mae, best_qwk
 

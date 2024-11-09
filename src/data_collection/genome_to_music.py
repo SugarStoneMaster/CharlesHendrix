@@ -1,7 +1,7 @@
 import music21.scale
-from music21 import roman, scale
+from music21 import roman
 
-from gene_space import *
+from src.data_collection.gene_space import *
 
 def genome_to_music(solution):
     # Extract global parameters
