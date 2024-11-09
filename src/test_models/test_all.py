@@ -5,6 +5,7 @@ from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix, clas
 from sklearn.metrics import mean_absolute_error, cohen_kappa_score
 from src.data_processing.feature_engineering import data_feature_engineering, split
 from src.test_models.test_random_forest_classifier import test_random_forest_classifier
+from src.test_models.test_random_forest_regressor import test_random_forest_regressor
 
 """model = Sequential([tensorflow.keras.layers.Dense(64, activation='relu', # First layer with 128 neurons
                                                       ), # Here we must specify the input shape
@@ -33,9 +34,14 @@ def main():
 
     df = data_feature_engineering(df)
 
-    X_train, y_train, X_test, y_test = split(df, smote=False)
+    X_train, y_train, X_test, y_test = split(df, smote=True)
 
     test_random_forest_classifier(X_train, y_train, X_test, y_test)
+
+    test_random_forest_regressor(X_train, y_train, X_test, y_test)
+
+
+
 
 
 

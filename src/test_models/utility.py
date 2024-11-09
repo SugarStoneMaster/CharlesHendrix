@@ -36,7 +36,7 @@ def run_ga(gene_space, fitness_function):
         random_mutation_min_val=0,
         random_mutation_max_val=1,
         suppress_warnings=True,
-        parallel_processing=20,
+        parallel_processing=10,
         keep_elitism=5,
     )
     ga_instance.on_generation = on_generation
@@ -52,10 +52,36 @@ def run_ga(gene_space, fitness_function):
     return solution, solution_fitness
 
 
-def on_generation(ga_instance):
-    current_generation = ga_instance.generations_completed
-    print(f"Generation {current_generation}")
+# Initialize tracking variables
+no_improvement_count = 0
+max_no_improvement_generations = 50
+best_mae = float("-inf")  # Start with worst possible MAE
+best_qwk = float("-inf")  # Start with worst possible QWK
+def on_generation(ga_instance: pygad.GA):
+    global no_improvement_count, best_mae, best_qwk
 
+    # Get the best solution’s fitness (tuple of MAE, QWK)
+    best_solution, best_fitness, _ = ga_instance.best_solution()
+    mae, qwk = best_fitness
+
+    # Check if the current solution dominates the previous best
+    if dominates(mae, qwk, best_mae, best_qwk):
+        best_mae, best_qwk = mae, qwk
+        no_improvement_count = 0  # Reset if there's improvement
+    else:
+        no_improvement_count += 1
+
+    # Stop if no improvement for specified generations
+    if no_improvement_count >= max_no_improvement_generations:
+        print(f"No improvement for {max_no_improvement_generations} generations. Stopping GA.")
+        return "stop"
+
+    print(f"Generation {ga_instance.generations_completed}: MAE = {mae:.4f}, QWK = {qwk:.4f}")
+
+
+def dominates(mae, qwk, best_mae, best_qwk):
+    # Returns True if (mae, qwk) is better in at least one objective and no worse in the other
+    return (mae < best_mae and qwk >= best_qwk) or (mae <= best_mae and qwk > best_qwk)
 
 
 
