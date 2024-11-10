@@ -1,14 +1,34 @@
 from sklearn.ensemble import RandomForestClassifier
-from src.test_models.utility import run_ga, evaluate_model
+
+from src.data_processing.feature_engineering import split
+from src.test_models.utility import run_ga, evaluate_model, repeat_cross_validation
 
 
-def test_random_forest_classifier(X_train, y_train, X_test, y_test):
-    fitness_function = set_fitness_function(X_train, y_train, X_test, y_test)
+def test_random_forest_classifier(df, test_first_params=True, repeat=2):
+    if test_first_params:
+        X_train, X_test, y_train, y_test = split(df, smote=True)
+        fitness_function = set_fitness_function(X_train, X_test, y_train, y_test)
+        fitness, solution = run_ga(gene_space, fitness_function)
+        params = map_solution_to_parameters(solution)
+        best_params = params
+    else:
+        params = None
 
-    return run_ga(gene_space, fitness_function)
+    final_avg_mae, final_avg_qwk, best_params_avg = repeat_cross_validation(df, n_splits=10, repeat=repeat,
+                                                                            test_first_params=test_first_params,
+                                                                            set_fitness_function=set_fitness_function,
+                                                                            gene_space=gene_space,
+                                                                            mapping=map_solution_to_parameters,
+                                                                            model_type=RandomForestClassifier,
+                                                                            params=params)
 
+    print(f"\nFinal Average MAE across 10 repeats: {final_avg_mae}")
+    print(f"Final Average QWK across 10 repeats: {final_avg_qwk}")
 
+    if best_params_avg is not None:
+        best_params = best_params_avg
 
+    return final_avg_mae, final_avg_qwk, best_params
 
 
 gene_space = [
@@ -22,7 +42,7 @@ gene_space = [
 ]
 criterion_options = ["gini", "entropy", "log_loss"]
 max_features_options = ["sqrt", "log2", None]
-def set_fitness_function(X_train, y_train, X_test, y_test):
+def set_fitness_function(X_train, X_test, y_train, y_test):
     def fitness_function(ga_instance, solution, solution_idx):
         n_estimators = int(solution[0])
 
@@ -61,16 +81,6 @@ def set_fitness_function(X_train, y_train, X_test, y_test):
         #multi-objective opt
         fitness = [negate_mae, qwk]
 
-        """
-        global best_fitness, no_improvement_count
-
-        # Check if there’s an improvement
-        if best_fitness is None or fitness > best_fitness:
-            best_fitness = fitness  # Update the best fitness
-            no_improvement_count = 0  # Reset stagnation counter
-        else:
-            no_improvement_count += 1  # Increment stagnation counter if no improvement
-        """
         return fitness
 
     return fitness_function
@@ -78,27 +88,36 @@ def set_fitness_function(X_train, y_train, X_test, y_test):
 
 
 
-"""
-# Track the number of generations without improvement
-no_improvement_count = 0
-max_no_improvement_generations = 20  # Trigger adaptation if no improvement in 20 generations
-base_mutation_percent = 20           # Base mutation rate (as percentage of genes)
-high_mutation_percent = 80           # Increased mutation rate
+def map_solution_to_parameters(solution):
+    # Extract each parameter from the solution array and map it to its meaning
+    n_estimators = int(solution[0])  # Direct integer mapping
 
-def adaptive_mutation(ga_instance, offspring):
-    global no_improvement_count, base_mutation_percent, high_mutation_percent
+    # Map criterion based on index (0: "gini", 1: "entropy", 2: "log_loss")
+    criterion = criterion_options[int(solution[1])]
 
-    # Determine the current mutation rate based on the stagnation count
-    mutation_percent = high_mutation_percent if no_improvement_count >= max_no_improvement_generations else base_mutation_percent
+    # Map max_depth, with 0 representing None and others in range 5-30
+    max_depth_value = int(solution[2])
+    max_depth = None if max_depth_value == 0 else max_depth_value + 5  # Shift by 5 to range 5-30
 
-    # Apply mutation to the offspring
-    for chromosome in offspring:
-        # Randomly mutate each gene with a probability based on the mutation rate
-        for gene_idx in range(len(chromosome)):
-            if np.random.rand() < (mutation_percent / 100.0):  # Convert percentage to probability
-                # Mutate by adding or subtracting a random value (or you can use the existing mutation range)
-                mutation_value = np.random.choice([-1, 1]) * np.random.randint(1, 3)
-                chromosome[gene_idx] += mutation_value
+    # Direct mapping for min_samples_split and min_samples_leaf
+    min_samples_split = int(solution[3])
+    min_samples_leaf = int(solution[4])
 
-    return offspring
-"""
+    # Map max_features based on index (0: "sqrt", 1: "log2", 2: None)
+    max_features_option = int(solution[5])
+    max_features = max_features_options[max_features_option]
+
+    # Map bootstrap (0: False, 1: True)
+    bootstrap = bool(solution[6])
+
+    # Return parameters as a dictionary
+    return {
+        'n_estimators': n_estimators,
+        'criterion': criterion,
+        'max_depth': max_depth,
+        'min_samples_split': min_samples_split,
+        'min_samples_leaf': min_samples_leaf,
+        'max_features': max_features,
+        'bootstrap': bootstrap
+    }
+

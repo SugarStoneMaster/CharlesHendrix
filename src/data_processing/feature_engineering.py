@@ -135,8 +135,7 @@ def feature_selection(df):
 def split(df, smote=False):
     # Convert 'UserInput' to categorical data
     y = df['UserInput']
-    df.drop(['UserInput'], axis=1, inplace=True)
-    X = df
+    X = df.drop(['UserInput'], axis=1)
 
     # Split data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -145,4 +144,4 @@ def split(df, smote=False):
         smote = SMOTE(random_state=42)
         X_train, y_train = smote.fit_resample(X_train, y_train)
 
-    return X_train, y_train, X_test, y_test
+    return X_train, X_test, y_train, y_test
