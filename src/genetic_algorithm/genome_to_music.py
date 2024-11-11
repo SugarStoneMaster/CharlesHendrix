@@ -1,7 +1,7 @@
 import music21.scale
 from music21 import roman
 
-from src.data_collection.gene_space import *
+from src.genetic_algorithm.gene_space import *
 
 def genome_to_music(solution):
     # Extract global parameters
@@ -118,6 +118,7 @@ def genome_to_music(solution):
     score.insert(0, chord_part)
 
     return score, last_used_idx
+
 
 def print_composition_details(composition: music21.stream.Score, solution):
     # Print the scale/key signature

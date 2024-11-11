@@ -1,18 +1,17 @@
 import pandas as pd
 from codecarbon import OfflineEmissionsTracker  # We import the emission tracker
 
+from src.genetic_algorithm.genetic_algorithm import genetic_algorithm
+
 
 def main():
     tracker = OfflineEmissionsTracker(country_iso_code="ITA")
 
     tracker.start()
 
-    #GA algorithm with inference
+    genetic_algorithm(inference=True)
 
     tracker.stop()
-
-
-
 
 
     emissions_csv = pd.read_csv("emissions.csv")

@@ -1,7 +1,7 @@
 import csv
 import os
 
-from src.data_collection.gene_space import scale_mapping, melody_instrument_mapping, chord_instrument_mapping, minor_chord_progressions, \
+from src.genetic_algorithm.gene_space import scale_mapping, melody_instrument_mapping, chord_instrument_mapping, minor_chord_progressions, \
     minor_chord_type_mapping, major_chord_progressions, major_chord_type_mapping
 
 

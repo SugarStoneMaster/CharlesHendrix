@@ -1,7 +1,7 @@
 import numpy as np
 from music21 import key, scale
 
-from src.data_collection.gene_space import duration_values
+from src.genetic_algorithm.gene_space import duration_values
 
 chord_functions = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'viio', 'i', 'iio', 'III', 'iv', 'v', 'VI', 'VII']
 

@@ -1,8 +1,20 @@
-from src.data_collection.genome_to_music import genome_to_music, print_composition_details
+from src.data_processing.feature_engineering import solution_to_features
+from src.genetic_algorithm.genome_to_music import genome_to_music, print_composition_details
 import csv
 import os
 
-def fitness_function(ga_instance, solution, solution_idx):
+def set_fitness_function_inference(model, scaler, columns):
+    def fitness_function_inference(ga_instance, solution, solution_idx):
+        X = solution_to_features(solution, scaler, columns)
+
+        fitness = model.predict(X)
+
+        return fitness
+
+    return fitness_function_inference
+
+
+def fitness_function_data_collection(ga_instance, solution, solution_idx):
     # Convert Genome to Music
     composition, last_used_idx = genome_to_music(solution)
 
