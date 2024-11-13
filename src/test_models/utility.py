@@ -9,8 +9,8 @@ from sklearn.model_selection import KFold
 
 
 
-def evaluate_model(y_test, y_pred, model_type=RandomForestRegressor):
-    if model_type is RandomForestRegressor or model_type is GradientBoostingRegressor:
+def evaluate_model(y_test, y_pred, model_type="regressor"):
+    if model_type == "regressor":
         # Round regression predictions to nearest integer between 1 and 5
         y_pred_rounded = np.clip(np.rint(y_pred), 1, 5).astype(int)
     else:
@@ -93,8 +93,12 @@ def cross_validation(df, n_splits=10, random_state=42, test_first_params=True, s
         # Predict on the test set for this fold
         y_pred = model.predict(X_test)
 
+        if model_type is RandomForestRegressor or model_type is GradientBoostingRegressor:
+            model_type_string = "regression"
+        else:
+            model_type_string = "classifier"
         # Evaluate and store results
-        mae, qwk = evaluate_model(y_test, y_pred, model_type=model_type)
+        mae, qwk = evaluate_model(y_test, y_pred, model_type=model_type_string)
         all_mae_scores.append(-mae)
         all_qwk_scores.append(qwk)
 
