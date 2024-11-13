@@ -9,7 +9,6 @@ def genome_to_data():
     input_file = '../../data/genome_user_feedback.csv'
     output_file = '../../data/user_feedback.csv'
 
-    # Ensure the data directory exists
     os.makedirs('../../data', exist_ok=True)
 
     # Read the input CSV file
@@ -22,28 +21,21 @@ def genome_to_data():
             writer = csv.writer(csvfile_out)
             writer.writerow(headers)  # Write the same headers
 
-            # Process each row
             for row in reader:
                 mapped_row = row.copy()  # Make a copy of the row to modify
 
-                # Map the Scale
                 scale_idx = int(mapped_row[0])
                 scale_name = scale_mapping.get(scale_idx, f"Unknown ({scale_idx})")
                 mapped_row[0] = scale_name
 
-                # Map the BPM (leave as is)
-                # mapped_row[1] = mapped_row[1]
-
-                # Map the Melody Instrument
                 melody_instr_idx = int(mapped_row[2])
                 mapped_row[2] = melody_instrument_mapping.get(melody_instr_idx, f"Unknown ({melody_instr_idx})")().instrumentName
 
-                # Map the Chord Instrument
                 chord_instr_idx = int(mapped_row[3])
                 mapped_row[3] = chord_instrument_mapping.get(chord_instr_idx, f"Unknown ({chord_instr_idx})")().instrumentName
 
-                # Map the Progression
                 progression_idx = int(mapped_row[4])
+
                 # Determine if the scale is major or minor
                 if scale_name.islower():  # Minor scales are denoted by lowercase letters
                     progression = minor_chord_progressions.get(progression_idx, [])
@@ -57,7 +49,6 @@ def genome_to_data():
                 mapped_row[4] = "-".join(progression_chords)
 
                 # Note, Octave, and Duration columns remain unchanged
-                # Optionally, you can process them if needed
 
                 # Write the mapped row to the output CSV
                 writer.writerow(mapped_row)

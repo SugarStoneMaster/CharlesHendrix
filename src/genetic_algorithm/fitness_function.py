@@ -7,7 +7,7 @@ def set_fitness_function_inference(model, scaler, columns):
     def fitness_function_inference(ga_instance, solution, solution_idx):
         X = solution_to_features(solution, scaler, columns)
 
-        fitness = model.predict(X)
+        fitness = float(model.predict(X))
 
         return fitness
 
@@ -21,7 +21,6 @@ def fitness_function_data_collection(ga_instance, solution, solution_idx):
     print_composition_details(composition, solution)
 
     composition.show('midi')  # Plays the music
-    composition.write('midi', fp=f'data/compositions/composition_{solution_idx}.mid')
 
     # Ask for user input
     user_input = input("Did you like the composition? (from 1 to 5): ")
@@ -62,7 +61,7 @@ def save_composition_and_feedback(solution, user_input, last_used_idx):
     # Add the UserInput column
     column_names.append("UserInput")
 
-    file_path = 'data/genome_user_feedback.csv'
+    file_path = '../data/genome_user_feedback.csv'
 
     # Check if the file already exists
     file_exists = os.path.isfile(file_path)

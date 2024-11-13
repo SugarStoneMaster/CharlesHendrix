@@ -12,15 +12,6 @@ from joblib import dump, load
 from sklearn.preprocessing import StandardScaler
 
 
-"""
-   Data cleaning: rimuovere le colonne con i -1 a partire dalla riga con più note. NO IMPUTATION
-   Feature construction: Dimensionality reduction PCA e/oppure costruzione di feature derivate ad esempio numero di note suonate, durata media, etc.
-   Feature scaling: scaling di features numeriche come numero di note suonate, durata media, etc.
-   Feature selection: una volta costruite le features vengono droppate le note. DA FARE low-variance e univariate
-   Data balancing: SMOTE
-"""
-
-
 def data_feature_engineering(df, mode='fit', scaler=None, column_structure=None):
     if 'UserInput' in df.columns or mode == 'fit':
         y = df['UserInput']  # Target column
@@ -47,7 +38,7 @@ def data_feature_engineering(df, mode='fit', scaler=None, column_structure=None)
 
     if y is not None:
         df_processed = pd.concat([X, y.reset_index(drop=True)], axis=1)
-        df_processed.to_csv("./completo.csv", index=False)
+        #df_processed.to_csv("./completo.csv", index=False)
     else:
         df_processed = X
 

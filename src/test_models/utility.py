@@ -30,7 +30,7 @@ def repeat_cross_validation(df, n_splits=10, repeat=10, test_first_params=True, 
     all_params = []  # Store all parameters from each fold and repetition
 
     for random_state in range(repeat):
-        print(f"Repeat {random_state + 1}")
+        #print(f"Repeat {random_state + 1}")
         avg_mae, avg_qwk, fold_params = cross_validation(
             df, n_splits=n_splits, random_state=random_state, test_first_params=test_first_params,
             set_fitness_function=set_fitness_function, gene_space=gene_space, model_type=model_type,
@@ -67,7 +67,7 @@ def cross_validation(df, n_splits=10, random_state=42, test_first_params=True, s
     all_qwk_scores = []
     fold_params = []  # Store parameters for each fold if tuning is done
     for fold, (train_index, test_index) in enumerate(kf.split(X)):
-        print(f"Fold {fold + 1}")
+        #print(f"Fold {fold + 1}")
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
@@ -169,9 +169,9 @@ def on_generation(ga_instance: pygad.GA):
     print(f"Generation {ga_instance.generations_completed}: MAE = {mae:.4f}, QWK = {qwk:.4f}")
 
 
-def dominates(mae, qwk, best_mae, best_qwk):
+def dominates(negative_mae, qwk, best_mae, best_qwk):
     # Returns True if (mae, qwk) is better in at least one objective and no worse in the other
-    return (mae < best_mae and qwk >= best_qwk) or (mae <= best_mae and qwk > best_qwk)
+    return (negative_mae > best_mae and qwk >= best_qwk) or (negative_mae >= best_mae and qwk > best_qwk)
 
 
 def aggregate_parameters(all_params):
