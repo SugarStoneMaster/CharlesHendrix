@@ -196,14 +196,16 @@ def aggregate_parameters(all_params):
             final_params[key] = None  # Assign None if no valid values remain
             continue
 
-        if isinstance(filtered_values[0], (int, float)):  # Continuous parameters
+        if isinstance(filtered_values[0], (int, float)) and key != 'bootstrap':  # Continuous parameters
             # Calculate mean and round if integer
             mean_value = np.mean(filtered_values)
             final_params[key] = int(round(mean_value)) if isinstance(filtered_values[0], int) else mean_value
         else:  # Categorical parameters (mode)
             # Calculate the mode after filtering out None values
             unique_values, counts = np.unique(filtered_values, return_counts=True)
-            final_params[key] = unique_values[np.argmax(counts)]  # Value with the highest count
+            mode_value = unique_values[np.argmax(counts)]
+            # Convert 0 and 1 to False and True specifically for 'bootstrap' or boolean-like keys
+            final_params[key] = bool(mode_value) if key == 'bootstrap' else mode_value
 
     return final_params
 

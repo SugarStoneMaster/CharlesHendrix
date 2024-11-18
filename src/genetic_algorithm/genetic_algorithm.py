@@ -1,6 +1,9 @@
 import os
 import subprocess
 import pygad
+
+from src.data_processing.feature_engineering import solution_to_features
+from src.explainability.local_surrogate import local_surrogate_regressor
 from src.genetic_algorithm.fitness_function import fitness_function_data_collection, set_fitness_function_inference, \
     save_composition_and_feedback
 from src.genetic_algorithm.gene_space import total_genes, gene_space
@@ -29,11 +32,12 @@ def genetic_algorithm(inference=False):
             keep_elitism=2
         )
     elif inference:
-        fitness_function_inference = set_fitness_function_inference(load("../model/model.joblib"),
-                                                                    load("../model/scaler.joblib"),
-                                                                    load("../model/columns.joblib"))
+        model = load("../model/model.joblib")
+        scaler = load("../model/scaler.joblib")
+        columns = load("../model/columns.joblib")
+        fitness_function_inference = set_fitness_function_inference(model=model, scaler=scaler, columns=columns)
         ga_instance = pygad.GA(
-            num_generations=10,
+            num_generations=100,
             num_parents_mating=20,
             fitness_func=fitness_function_inference,
             sol_per_pop=30,
@@ -69,9 +73,15 @@ def genetic_algorithm(inference=False):
             print("Invalid input. Assuming Dislike (1).")
             user_input = 1
 
+        # explain prediction
+        instance = solution_to_features(solution, scaler=scaler, column_structure=columns)
+        local_surrogate_regressor(model, instance)
+
         save_composition_and_feedback(solution, user_input, last_used_idx)
 
         counter = read_and_increment_counter()
+
+
 
     # dataset has enough new entries, retrain
     if (not inference) or counter >= 50:

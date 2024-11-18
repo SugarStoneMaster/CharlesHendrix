@@ -141,11 +141,11 @@ def feature_scaling(df, scaler=None, column_structure=None):
         df[numerical_features] = scaler.fit_transform(df[numerical_features])
 
         # Save the scaler to a file
-        dump(scaler, "../../model/scaler.joblib")
+        dump(scaler, "/Users/carmine/PycharmProjects/CharlesHendrix/model/scaler.joblib")
 
         # Save the column structure
         column_structure = df.columns
-        dump(column_structure, "../../model/columns.joblib")
+        dump(column_structure, "/Users/carmine/PycharmProjects/CharlesHendrix/model/columns.joblib")
 
     else:
         # This is the 'transform' case: we need to apply the existing scaler and ensure the columns match

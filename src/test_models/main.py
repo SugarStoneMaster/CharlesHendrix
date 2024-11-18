@@ -14,7 +14,7 @@ def main():
     df = pd.read_csv('../../data/user_feedback.csv')
     df = data_feature_engineering(df, mode='fit')
 
-    best_model, best_params, mae, qwk = test_all_models(df, test_first_params=True, repeat=2)
+    best_model, best_params, mae, qwk = test_all_models(df, test_first_params=True, repeat=10)
     if best_model == "classifier":
         model = RandomForestClassifier(**best_params, random_state=42, n_jobs=-1)
     elif best_model == "regressor":
