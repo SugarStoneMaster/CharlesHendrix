@@ -1,0 +1,12 @@
+music21
+pygad
+numpy
+pandas
+scikit-learn
+imblearn
+keras
+tensorflow
+codecarbon
+xgboost
+shap
+lime
