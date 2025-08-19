@@ -1,14 +1,57 @@
 # CharlesHendrix
-## Autore
-Carmine Iemmino
-## Obiettivo del progetto
-L'obiettivo del progetto è sviluppare un sistema software che, dato in input numero di battute e scala da usare, permetta di comporre musica in maniera automatica. In questo caso la scelta per la risoluzione del problema è virata sugli algoritmi genetici.
-## Risorse della repository 
-**src**: contiene il codice sorgente del sistema <br />
-**xmls**: contiene files .xml da cui è stata isolata la melodia principale. In una precedente versione del sistema era possibile utilizzarli per effettuare mash-ups di composizioni. Allo stato attuale ciò non è possibile ma, tramite piccole modifiche al codice che verranno effettuate in seguito, la funzionalità tornerà disponibile. <br />
-**documentation**: contiene la documentazione relativa al sistema
-## Utilizzo del sistema
-Il file main del sistema è *Runner.py* che permette di creare una composizione musicale. Tramite codice si possono effettuare modifiche ai parametri del *Composer*: numero di battute, durata dell’elemento musicale più piccolo, scala (istanza di *Key*), una progressione di accordi, una lista di intervalli considerati spiacevoli, i pesi dei criteri della funzione di fitness, le probabilità di mutazione dei diversi elementi musicali e un valore booleanoche indica se comporre utilizzando tutte le note o esclusivamente quelle della scala oppure ai parametri tipici di un algoritmo genetico, come numero di generazioni, numero di individui per generazione, numero di genitori che si accoppiano, etc. <br />
-A riga 24 di *Runner.py* è presente un'istruzione che permette di generare una progressione di accordi tramite algoritmo genetico interattivo implementato in *Chords.py*. Quest'istruzione è di default commentata, permettendo eventualmente di definire in maniera manuale una progressione di accordi tramite l'istanziazione di un *Composer*. <br />
-Per l'esecuzione è inoltre fondamentale aver installato la libreria *pygad*: https://pygad.readthedocs.io/en/latest/index.html e la libreria *music21*: http://web.mit.edu/music21/doc/index.html <br />
-Per riprodurre la composizione generata è inoltre necessario avere un software di manipolazione musicale che permetta la lettura di file *.midi* o *.musicxml*. Questo programma va poi associato con *music21*, in modo che quando venga chiamato il metodo *show()* su un oggetto *Stream*, questo venga riprodotto sul software musicale.
+
+CharlesHendrix is a project that uses a genetic algorithm to generate musical compositions. The fitness of each composition is evaluated by a pre-trained machine learning model, guiding the evolutionary process toward creating aesthetically pleasing music.
+
+## Project Overview
+
+This project combines concepts from evolutionary computation and machine learning to explore algorithmic music generation. The core of the project is a genetic algorithm that evolves populations of musical "genomes." A machine learning model, trained on user feedback, acts as the fitness function, predicting a score for each generated genome.
+
+## Directory Structure
+
+The project is organized into the following directories:
+
+*   `data/`: Contains raw and processed data, including user feedback, generated compositions, and feature notes.
+*   `documentation/`: Holds project documentation.
+*   `model/`: Stores the serialized machine learning model, scaler, and other necessary objects.
+*   `src/`: Contains all the Python source code.
+    *   `data_processing/`: Scripts for data extraction and feature engineering.
+    *   `explainability/`: Tools for interpreting the machine learning model's predictions.
+    *   `genetic_algorithm/`: The core implementation of the genetic algorithm, including fitness evaluation and genome handling.
+    *   `test_models/`: Scripts for evaluating and comparing different machine learning models.
+
+## Getting Started
+
+### Prerequisites
+
+*   Python 3.10 or higher
+*   pip
+
+### Installation
+
+1.  Clone the repository to your local machine:
+    ```bash
+    git clone https://github.com/SugarStoneMaster/CharlesHendrix.git
+    cd CharlesHendrix
+    ```
+
+2.  Install the required Python packages using `requirements.txt`:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Usage
+
+To run the genetic algorithm and generate a new musical composition, execute the main script:
+
+```bash
+python src/main.py
+```
+
+The script will run the evolutionary process and save the resulting composition.
+
+## How It Works
+
+1.  **Genetic Algorithm**: The process starts with an initial population of random musical genomes.
+2.  **Fitness Evaluation**: Each genome is converted into a set of musical features. These features are fed into a pre-trained machine learning model (`model/model.joblib`) which outputs a fitness score.
+3.  **Selection, Crossover, and Mutation**: Genomes with higher fitness scores are more likely to be selected for reproduction. New genomes are created through crossover (combining parts of two parent genomes) and mutation (randomly altering a genome).
+4.  **Evolution**: This cycle repeats for a set number of generations, with the population's overall fitness improving over time. The best genome from the final generation is selected as the result.
